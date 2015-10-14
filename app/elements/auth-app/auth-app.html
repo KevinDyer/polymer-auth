@@ -4,9 +4,17 @@
       display: block;
     }
 
-    .login {
-      width: 320px;
+    .content {
+      @apply(--layout-vertical);
+      @apply(--layout-center);
     }
+
+    .card {
+      margin: 8px;
+      background-color: #fff;
+      padding: 4px;
+    }
+
   </style>
   <template>
 
@@ -27,19 +35,23 @@
         <paper-toolbar>
           <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
           <div class="title">My App</div>
+          <div class="username">[[_computeUsername(user)]]</div>
           <paper-menu-button horizontal-align="right">
             <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
             <paper-menu class="dropdown-content">
-              <paper-item>Settings</paper-item>
-              <paper-item>Share</paper-item>
-              <paper-item>Logout</paper-item>
-              <paper-item>Help</paper-item>
+              <paper-item on-tap="showSettings">Settings</paper-item>
+              <paper-item on-tap="onLogout" hidden$="[[!user]]">Logout</paper-item>
             </paper-menu>
           </paper-menu-button>
         </paper-toolbar>
 
         <div class="content">
 
+          <paper-material class="card user-info">
+            <div class="title">User Info</div>
+            <paper-input label="Display Name" value="{{userInfo.displayName}}"></paper-input>
+            <paper-input label="Age" min="0" type="number" value="{{userInfo.age}}"></paper-input>
+          </paper-material>
         </div>
       </paper-header-panel>
     </paper-drawer-panel>
@@ -51,7 +63,9 @@
       </div>
     </paper-dialog>
 
-    <firebase-auth id="auth" location="https://popping-fire-1621.firebaseio.com/" provider="google" user="{{user}}"></firebase-auth>
+    <firebase-document id="user-info" location="[[_computeUserInfoLocation(location, user)]]" data="{{userInfo}}"></firebase-document>
+
+    <firebase-auth id="auth" location="[[location]]" provider="google" user="{{user}}"></firebase-auth>
   </template>
 </dom-module>
 <script>
@@ -61,8 +75,50 @@
     Polymer({
       is: 'auth-app',
 
+      properties: {
+        location: {
+          type: String,
+          value: 'https://popping-fire-1621.firebaseio.com/',
+          notify: true,
+          readOnly: true
+        },
+        userInfo: {
+          type: Object,
+          notify: true
+        }
+      },
+
+      observers: [
+        '_userInfoChanged(userInfo)'
+      ],
+
+      _userInfoChanged: function(userInfo) {
+        if (!userInfo && this.user) {
+          this.userInfo = {};
+        }
+      },
+
+      _computeUsername: function(user) {
+        if (!user) {
+          return 'login?';
+        } else if ('google' === user.provider) {
+          return user.google.displayName;
+        } else {
+          return user.uid;
+        }
+      },
+
+      _computeUserInfoLocation: function(location, user) {
+        if (!location || !user) {
+          this.$['user-info'].disconnect();
+          return '';
+        }
+        return location + 'users/' + user.uid + '/';
+      },
+
       onLogout: function() {
         this.$.auth.logout();
+
       },
 
       onLogin: function() {
