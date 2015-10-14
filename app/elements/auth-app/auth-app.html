@@ -12,35 +12,42 @@
 
     <paper-drawer-panel>
       <paper-header-panel drawer>
-        <paper-toolbar>Menu</paper-toolbar>
+        <paper-toolbar>
+          <div>Menu</div>
+        </paper-toolbar>
 
-        <paper-menu attr-for-selected="hash" selected="{{page}}">
-          <paper-item hash="home">Home</paper-item>
-          <paper-item hash="users">Users</paper-item>
+        <paper-menu>
+          <paper-item>Item 1</paper-item>
+          <paper-item>Item 2</paper-item>
         </paper-menu>
+
       </paper-header-panel>
 
       <paper-header-panel main>
         <paper-toolbar>
           <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-          <div class="title">My Auth App</div>
+          <div class="title">My App</div>
           <paper-menu-button horizontal-align="right">
             <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
-            <paper-menu id="action" class="dropdown-content">
-              <paper-item on-tap="onLogout">Logout</paper-item>
+            <paper-menu class="dropdown-content">
+              <paper-item>Settings</paper-item>
+              <paper-item>Share</paper-item>
+              <paper-item>Logout</paper-item>
+              <paper-item>Help</paper-item>
             </paper-menu>
           </paper-menu-button>
         </paper-toolbar>
+
+        <div class="content">
+
+        </div>
       </paper-header-panel>
     </paper-drawer-panel>
 
-    <paper-dialog class="login" opened="[[!user]]" modal>
+    <paper-dialog opened="[[!user]]" modal>
       <h2>Login</h2>
-      <paper-dialog-scrollable>
-        Please login?
-      </paper-dialog-scrollable>
       <div class="buttons">
-        <paper-button on-tap="onLogin" dialog-confirm>Login</paper-button>
+        <paper-button on-tap="onLogin">Login</paper-button>
       </div>
     </paper-dialog>
 
@@ -48,15 +55,20 @@
   </template>
 </dom-module>
 <script>
-  Polymer({
-    is: 'auth-app',
+  (function() {
+    'use strict';
 
-    onLogout: function() {
-      this.$.auth.logout();
-    },
+    Polymer({
+      is: 'auth-app',
 
-    onLogin: function() {
-      this.$.auth.login();
-    }
-  });
+      onLogout: function() {
+        this.$.auth.logout();
+      },
+
+      onLogin: function() {
+        this.$.auth.login();
+      }
+    });
+
+  }());
 </script>
